@@ -1,6 +1,9 @@
+import numpy as np
+import scipy as sp
+from numpy import core
+from numpy.core import multiarray
 
-import numpy
-import scipy
+
 def findBetween(longText, begin, end):
     ret = []
     start = 0
@@ -8,8 +11,11 @@ def findBetween(longText, begin, end):
         start = longText.find(begin, start) + len(begin)
         if start == len(begin)-1:
             break
-        last = longText.index(end, start)
-        ret.append( longText[start:last])
+        last = longText.find(end, start)
+        if last == -1:
+            ret.append(longText[start:])#found the open token, not the close.  May want to adjust behavior
+            break
+        ret.append(longText[start:last])
     return ret
 
 
@@ -25,8 +31,8 @@ def turnIntoTokenStruct(openToken, closeToken):
 def testAux():
     longText = "This is a long sentence<!> with <b>random</b> tags in <i>it which don't make much" \
                " sense but </i> will at least illustrate <?> how <b>the function</b> should be used <!>"
-    openTokens = ["<b>", "<i>", '<a >', '<?>']
-    closeTokens = ["</b>", "</i>", '< u>', '<!>']
+    openTokens = ["<b>", "<i>", '<a >', '<?>', 'a', ' ']
+    closeTokens = ["</b>", "</i>", '< u>', '<!>', 'i', ' ']
     tokens = []
     for i in range(0, len(openTokens)):
         tokens.append(turnIntoTokenStruct(openTokens[i], closeTokens[i]))
