@@ -1,13 +1,16 @@
+
 import numpy
 import scipy
-import blas
 def findBetween(longText, begin, end):
-    try:
-        start = longText.index(begin) + len(begin)
+    ret = []
+    start = 0
+    while(1):
+        start = longText.find(begin, start) + len(begin)
+        if start == len(begin)-1:
+            break
         last = longText.index(end, start)
-        return longText[start:last]
-    except ValueError:
-        return ""  # not Found
+        ret.append( longText[start:last])
+    return ret
 
 
 def parseFile(contents, tokens, ret):
@@ -20,7 +23,7 @@ def turnIntoTokenStruct(openToken, closeToken):
     return {'open': openToken, 'close': closeToken}
 
 def testAux():
-    longText = "This is a long sentence with <b>random</b> tags in <i>it which don't make much" \
+    longText = "This is a long sentence<!> with <b>random</b> tags in <i>it which don't make much" \
                " sense but </i> will at least illustrate <?> how <b>the function</b> should be used <!>"
     openTokens = ["<b>", "<i>", '<a >', '<?>']
     closeTokens = ["</b>", "</i>", '< u>', '<!>']
@@ -33,7 +36,7 @@ def testAux():
         tokenDict = parseFile(longText, token, tokenDict)
 
     for token in tokens:
-        print("Token " + token['open'] + ": " + tokenDict[token['open']])
+        print("Token " + token['open'] + ": ", tokenDict[token['open']])
 
 
 testAux()
