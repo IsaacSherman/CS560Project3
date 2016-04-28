@@ -83,6 +83,21 @@ def preprocesslevel1(filename="simplewiki-20160305-pages-meta-current.xml"):
                         fout.write(line[start:])
 
 
+def replaceSpecialStartingTokens(item):
+    listOfInvalidTokens = [
+        'User_talk:',
+        'Wikipedia:',
+        'Category:',
+        'Talk:',
+        'User:',
+        'Wikipedia_talk:'
+    ]
+    for token in listOfInvalidTokens:
+        if item.find(token) == 0:
+            item = item.replace(token, "")
+    return item.strip(',')
+
+
 def preprocessLevel2(file='superStripped.txt'):
     tokens = []
     delim = "!!!|!!!"
@@ -104,6 +119,7 @@ def preprocessLevel2(file='superStripped.txt'):
                         continue
                     item = item.replace(' ', '_')
                     item = item.replace("\n", "")
+                    item = replaceSpecialStartingTokens(item)
                     end = item.find('|')
                     if end == -1:
                         end = len(item.strip())
@@ -169,8 +185,8 @@ def preprocessLevel3(filename='minimal.txt'):
 
 
 
-# preprocesslevel1()
-# preprocessLevel2()
+preprocesslevel1()
+preprocessLevel2()
 try:
     linkDict = pickle.load(open('linkDict.pkl', 'rb'))
 except IOError:
@@ -198,7 +214,7 @@ with open('linkListSorted.txt', 'w', encoding='utf8') as fout:
     for key in linkKeys:
         fout.write(key + "\n")
 
-
+print("Dumped sorted lists")
 
 try:
     intDict = pickle.load(open('intDict.pkl','rb'))

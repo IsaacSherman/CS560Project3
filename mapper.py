@@ -23,13 +23,13 @@ for line in sys.stdin:
 	if not value:
 		for key in titles:
 			key = key.strip()
-			print key + '|:' + str(pr/len(titles))
+			print(key + '|:' + str(pr/len(titles)))
 	
 	# if page is NOT dangling
 	else:
 		for key in linksList:
 			key = key.strip()
-			print key + '|:' + str(pr/len(linksList))
+			print (key + '|:' + str(pr/len(linksList)))
 
 	# finally emit self
-	print index + "|:" + '[' + value + ']' #PICK BACK UP HERE!	
+	print (index + "|:" + '[' + value + ']') #PICK BACK UP HERE!
