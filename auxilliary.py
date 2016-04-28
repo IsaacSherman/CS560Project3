@@ -114,6 +114,32 @@ def preprocessLevel2(file='superStripped.txt'):
                     tokenDict = {}
 
 
+
+
+def intifyDicts():
+    global intDict
+    titleDict, titleArray = loadTitleFile()
+    intDict = {}
+
+    def intifyList(strlist, dict):
+        ret = []
+        for string in strlist:
+            if string in ret:
+                continue
+            else:
+                ret.append(dict[string])
+        ret.sort()
+        return ret
+
+
+
+    for key in titleDict.keys():
+        if key not in titleDict:
+            print("missing key ", key)
+        else:
+            intDict[titleDict[key]] = intifyList(linkDict[key], titleDict)
+
+
 def preprocessLevel3(filename='minimal.txt'):
     ret = {}
     delim = "!!!|!!!"
@@ -128,6 +154,7 @@ def preprocessLevel3(filename='minimal.txt'):
                 print("delim Not found", line)
                 continue
             title, linkstr = line.split(delim)
+            title = title.replace(" ", "_")
             links = linkstr.split(', ')
             if title in ret.keys():
                 print("duplicate title found:", title)
@@ -149,29 +176,8 @@ except IOError:
     linkDict = preprocessLevel3()
     pickle.dump(linkDict, open('linkDict.pkl', 'wb'))
 
-
-
-def intifyDicts():
-    global intDict
-    titleDict, titleArray = loadTitleFile()
-    intDict = {}
-
-    def intifyList(strlist, dict):
-        ret = []
-        for string in strlist:
-            if string in ret:
-                continue
-            else:
-                ret.append(dict[string])
-        ret.sort()
-        return ret
-
-    for key in linkDict.keys():
-        intDict[titleDict[key]] = intifyList(titleDict[key], titleDict)
-
-testAux()
 try:
-    pickle.load(open('intDict.pkl','rb'))
+    intDict = pickle.load(open('intDict.pkl','rb'))
 except IOError:
     intDict = intifyDicts()
     pickle.dump(intDict, open('intDict.pkl', 'wb'))
@@ -179,6 +185,8 @@ except IOError:
 with open('titleLen.txt', 'w') as lenFile:
     lenFile.write(len(intDict.keys()))
 
+
+testAux()
 
 
 
