@@ -118,7 +118,7 @@ def preprocessLevel2(file='superStripped.txt'):
 
 def intifyDicts():
     global intDict
-    titleDict, titleArray = loadTitleFile()
+
     intDict = {}
 
     def intifyList(strlist, dict):
@@ -168,6 +168,7 @@ def preprocessLevel3(filename='minimal.txt'):
     return ret
 
 
+
 # preprocesslevel1()
 # preprocessLevel2()
 try:
@@ -176,9 +177,33 @@ except IOError:
     linkDict = preprocessLevel3()
     pickle.dump(linkDict, open('linkDict.pkl', 'wb'))
 
+global titleDict, titleList
+
+titleDict, titleList = loadTitleFile()
+titleKeys = []
+for key in titleDict.keys():
+    titleKeys.append(key)
+
+titleKeys.sort()
+linkKeys = []
+for key in linkDict.keys():
+    linkKeys.append(key)
+linkKeys.sort()
+
+
+with open('titleListSorted.txt', 'w', encoding='utf8') as fout:
+    for key in titleKeys:
+        fout.write(key + "\n")
+with open('linkListSorted.txt', 'w', encoding='utf8') as fout:
+    for key in linkKeys:
+        fout.write(key + "\n")
+
+
+
 try:
     intDict = pickle.load(open('intDict.pkl','rb'))
 except IOError:
+
     intDict = intifyDicts()
     pickle.dump(intDict, open('intDict.pkl', 'wb'))
 
@@ -187,7 +212,6 @@ with open('titleLen.txt', 'w') as lenFile:
 
 
 testAux()
-
 
 
 
