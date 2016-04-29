@@ -214,78 +214,64 @@ def preprocessLevel3(filename='minimal.txt'):
     return ret
 
 
-
-#preprocesslevel1()
-#preprocessLevel2()
-try:
-    linkDict = pickle.load(open('linkDict.pkl', 'rb'))
-except IOError:
-    linkDict = preprocessLevel3()
-    pickle.dump(linkDict, open('linkDict.pkl', 'wb'))
-
-global titleDict, titleList
-
-titleDict, titleList = loadTitleFile()
-titleKeys = set()
-for key in titleDict.keys():
-    titleKeys.add(key)
-linkKeys = set()
-for key in linkDict.keys():
-    linkKeys.add(key)
-
-fusedSet = titleKeys.union(linkKeys)
-linkKeys = list(linkKeys)
-linkKeys.sort()
-titleKeys = list(titleKeys)
-titleKeys.sort()
-
-fusedSet = list(fusedSet)
-fusedSet.sort()
-titleDict = {}
-fusedArray = []
-for i in range(0, len(fusedSet)):
-    titleDict[fusedSet[i]] = i
-    fusedArray.append(fusedSet[i])
-    i+=1
-
-pickle.dump(fusedSet, open("titleToInt.pkl", 'wb'))
-pickle.dump(fusedArray, open("intToTitle.pkl", 'wb'))
-
-
-with open('titleListSorted.txt', 'w', encoding='utf8') as fout:
-    for key in titleKeys:
-        fout.write(key + "\n")
-with open('linkListSorted.txt', 'w', encoding='utf8') as fout:
-    for key in linkKeys:
-        fout.write(key + "\n")
-
-print("Dumped sorted lists")
-
-titleKeys = None
-linkKeys = None
-
-try:
-    intDict = pickle.load(open('intDict.pkl','rb'))
-except IOError:
-    intDict = intifyDicts()
-    pickle.dump(intDict, open('intDict.pkl', 'wb'))
-
-with open('titleLen.txt', 'w') as lenFile:
-    lenFile.write(str(len(fusedSet)))
-
-defaultVal = 1.0/len(fusedSet)
-
-with open("dataFile", 'w') as fout:
-    for key in intDict:
-        fout.write(str(key) + ","+str(defaultVal)+"|:")
-        tempstr = ""
-        for num in intDict[key]:
-            tempstr += str(num)
-            tempstr+=","
-        tempstr= tempstr[0:len(tempstr)-1]
-        fout.write(tempstr+"\n")
-
-
+def preprocess():
+    global linkDict, intDict
+    # preprocesslevel1()
+    # preprocessLevel2()
+    try:
+        linkDict = pickle.load(open('linkDict.pkl', 'rb'))
+    except IOError:
+        linkDict = preprocessLevel3()
+        pickle.dump(linkDict, open('linkDict.pkl', 'wb'))
+    global titleDict, titleList
+    titleDict, titleList = loadTitleFile()
+    titleKeys = set()
+    for key in titleDict.keys():
+        titleKeys.add(key)
+    linkKeys = set()
+    for key in linkDict.keys():
+        linkKeys.add(key)
+    fusedSet = titleKeys.union(linkKeys)
+    linkKeys = list(linkKeys)
+    linkKeys.sort()
+    titleKeys = list(titleKeys)
+    titleKeys.sort()
+    fusedSet = list(fusedSet)
+    fusedSet.sort()
+    titleDict = {}
+    fusedArray = []
+    for i in range(0, len(fusedSet)):
+        titleDict[fusedSet[i]] = i
+        fusedArray.append(fusedSet[i])
+        i += 1
+    pickle.dump(fusedSet, open("titleToInt.pkl", 'wb'))
+    pickle.dump(fusedArray, open("intToTitle.pkl", 'wb'))
+    with open('titleListSorted.txt', 'w', encoding='utf8') as fout:
+        for key in titleKeys:
+            fout.write(key + "\n")
+    with open('linkListSorted.txt', 'w', encoding='utf8') as fout:
+        for key in linkKeys:
+            fout.write(key + "\n")
+    print("Dumped sorted lists")
+    titleKeys = None
+    linkKeys = None
+    try:
+        intDict = pickle.load(open('intDict.pkl', 'rb'))
+    except IOError:
+        intDict = intifyDicts()
+        pickle.dump(intDict, open('intDict.pkl', 'wb'))
+    with open('titleLen.txt', 'w') as lenFile:
+        lenFile.write(str(len(fusedSet)))
+    defaultVal = 1.0 / len(fusedSet)
+    with open("dataFile", 'w') as fout:
+        for key in intDict:
+            fout.write(str(key) + "," + str(defaultVal) + "|:")
+            tempstr = ""
+            for num in intDict[key]:
+                tempstr += str(num)
+                tempstr += ","
+            tempstr = tempstr[0:len(tempstr) - 1]
+            fout.write(tempstr + "\n")
 
 
 # https://gist.github.com/diogojc/1338222
