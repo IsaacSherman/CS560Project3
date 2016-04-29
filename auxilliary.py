@@ -90,11 +90,24 @@ def replaceSpecialStartingTokens(item):
         'Category:',
         'Talk:',
         'User:',
-        'Wikipedia_talk:'
+        'Help:',
+        'Wikipedia_talk:',
+        'Template:',
+        "EVILHORSE:"
     ]
-    for token in listOfInvalidTokens:
-        if item.find(token) == 0:
-            item = item.replace(token, "")
+    item = item.replace("&quot;", '"')
+    item = item.replace("&amp;", "&")
+    item = item.replace("&gt;", ">")
+    item = item.replace("&lt;", "<")
+    item = item.replace("{", "")
+    item = item.replace("#", "")
+    item = item.replace("[", "")
+    item = item.strip(",\t.: \r\n#")
+
+    if item.find(":") != -1:
+        for token in listOfInvalidTokens:
+            if item.find(token) == 0:
+                item = item.replace(token, "")
     return item.strip(',')
 
 
@@ -171,6 +184,7 @@ def preprocessLevel3(filename='minimal.txt'):
                 continue
             title, linkstr = line.split(delim)
             title = title.replace(" ", "_")
+            title = replaceSpecialStartingTokens(title)
             links = linkstr.split(', ')
             if title in ret.keys():
                 print("duplicate title found:", title)
@@ -185,7 +199,7 @@ def preprocessLevel3(filename='minimal.txt'):
 
 
 
-preprocesslevel1()
+#preprocesslevel1()
 preprocessLevel2()
 try:
     linkDict = pickle.load(open('linkDict.pkl', 'rb'))
@@ -199,13 +213,16 @@ titleDict, titleList = loadTitleFile()
 titleKeys = []
 for key in titleDict.keys():
     titleKeys.append(key)
-
 titleKeys.sort()
 linkKeys = []
 for key in linkDict.keys():
     linkKeys.append(key)
+    for link in linkDict[key]:
+        linkKeys.append(link)
 linkKeys.sort()
-
+linkSet = set(linkKeys)
+linkKeys = list(linkSet)
+linkKeys.sort()
 
 with open('titleListSorted.txt', 'w', encoding='utf8') as fout:
     for key in titleKeys:
@@ -224,7 +241,7 @@ except IOError:
     pickle.dump(intDict, open('intDict.pkl', 'wb'))
 
 with open('titleLen.txt', 'w') as lenFile:
-    lenFile.write(len(intDict.keys()))
+    lenFile.write(len(titleKeys))
 
 
 testAux()
