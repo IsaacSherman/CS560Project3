@@ -1,6 +1,13 @@
 import pickle
 
 
+def loadTitleToIntTranslator():
+    return pickle.load(open('titleToInt.pkl', 'rb'))
+
+def loadInToTitleTranslator():
+    return pickle.load(open('intToTitle.pkl', 'rb'))
+
+
 def loadTitleFile(filename='simplewiki-20160305-all-titles'):
     retlist = []
     retdict = {}
@@ -240,6 +247,9 @@ for i in range(0, len(fusedSet)):
     titleDict[fusedSet[i]] = i
     fusedArray.append(fusedSet[i])
     i+=1
+
+pickle.dump(fusedSet, open("titleToInt.pkl", 'wb'))
+pickle.dump(fusedArray, open("intToTitle.pkl", 'wb'))
 
 
 with open('titleListSorted.txt', 'w', encoding='utf8') as fout:
