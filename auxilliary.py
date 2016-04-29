@@ -7,7 +7,7 @@ def loadTitleFile(filename='simplewiki-20160305-all-titles'):
     count = 0
     with open(filename, 'r', encoding='utf8') as fin:
         for line in fin.readlines():
-            modded = line.strip()
+            modded = replaceSpecialStartingTokens(line)
             retdict[modded] = count
             retlist.append(modded)
             count += 1
@@ -93,7 +93,16 @@ def replaceSpecialStartingTokens(item):
         'Help:',
         'Wikipedia_talk:',
         'Template:',
+        'Template_talk:',
+        'MediaWiki:',
+        "MediaWiki_talk:",
+        'Category_talk:',
+        'Help_talk:',
+        'File:',
+        "Module:",
+        "Module_talk:",
         "EVILHORSE:"
+
     ]
     item = item.replace("&quot;", '"')
     item = item.replace("&amp;", "&")
@@ -102,7 +111,7 @@ def replaceSpecialStartingTokens(item):
     item = item.replace("{", "")
     item = item.replace("#", "")
     item = item.replace("[", "")
-    item = item.strip(",\t.: \r\n#")
+    item = item.strip(",\t \r\n#")
 
     if item.find(":") != -1:
         for token in listOfInvalidTokens:
@@ -151,23 +160,22 @@ def intifyDicts():
     intDict = {}
 
     def intifyList(strlist, dict):
-        ret = []
+        ret = set()
         for string in strlist:
-            if string in ret:
+            if string not in dict:
                 continue
-            else:
-                ret.append(dict[string])
+            ret.add(dict[string])
+        ret = list(ret)
         ret.sort()
         return ret
 
 
 
     for key in titleDict.keys():
-        if key not in titleDict:
-            print("missing key ", key)
-        else:
-            intDict[titleDict[key]] = intifyList(linkDict[key], titleDict)
-
+        if key not in linkDict:
+            linkDict[key] = []#Dangler
+        intDict[titleDict[key]] = intifyList(linkDict[key], titleDict)
+    return intDict
 
 def preprocessLevel3(filename='minimal.txt'):
     ret = {}
@@ -189,18 +197,19 @@ def preprocessLevel3(filename='minimal.txt'):
             if title in ret.keys():
                 print("duplicate title found:", title)
             else:
-                ret[title] = []
+                ret[title] = set()
+
             for link in links:
                 if (link in ret[title]):
                     pass
                 else:
-                    ret[title].append(link)
+                    ret[title].add(link)
     return ret
 
 
 
 #preprocesslevel1()
-preprocessLevel2()
+#preprocessLevel2()
 try:
     linkDict = pickle.load(open('linkDict.pkl', 'rb'))
 except IOError:
@@ -210,19 +219,28 @@ except IOError:
 global titleDict, titleList
 
 titleDict, titleList = loadTitleFile()
-titleKeys = []
+titleKeys = set()
 for key in titleDict.keys():
-    titleKeys.append(key)
-titleKeys.sort()
-linkKeys = []
+    titleKeys.add(key)
+linkKeys = set()
 for key in linkDict.keys():
-    linkKeys.append(key)
-    for link in linkDict[key]:
-        linkKeys.append(link)
+    linkKeys.add(key)
+
+fusedSet = titleKeys.union(linkKeys)
+linkKeys = list(linkKeys)
 linkKeys.sort()
-linkSet = set(linkKeys)
-linkKeys = list(linkSet)
-linkKeys.sort()
+titleKeys = list(titleKeys)
+titleKeys.sort()
+
+fusedSet = list(fusedSet)
+fusedSet.sort()
+titleDict = {}
+fusedArray = []
+for i in range(0, len(fusedSet)):
+    titleDict[fusedSet[i]] = i
+    fusedArray.append(fusedSet[i])
+    i+=1
+
 
 with open('titleListSorted.txt', 'w', encoding='utf8') as fout:
     for key in titleKeys:
@@ -233,18 +251,29 @@ with open('linkListSorted.txt', 'w', encoding='utf8') as fout:
 
 print("Dumped sorted lists")
 
+titleKeys = None
+linkKeys = None
+
 try:
     intDict = pickle.load(open('intDict.pkl','rb'))
 except IOError:
-
     intDict = intifyDicts()
     pickle.dump(intDict, open('intDict.pkl', 'wb'))
 
 with open('titleLen.txt', 'w') as lenFile:
-    lenFile.write(len(titleKeys))
+    lenFile.write(str(len(fusedSet)))
 
+defaultVal = 1.0/len(fusedSet)
 
-testAux()
+with open("dataFile", 'w') as fout:
+    for key in intDict:
+        fout.write(str(key) + ","+str(defaultVal)+"|:")
+        tempstr = ""
+        for num in intDict[key]:
+            tempstr += str(num)
+            tempstr+=","
+        tempstr= tempstr[0:len(tempstr)-1]
+        fout.write(tempstr+"\n")
 
 
 
