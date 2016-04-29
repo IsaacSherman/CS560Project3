@@ -4,7 +4,9 @@ import sys
 
 titleF = open('names', 'r')
 titles = {}
+
 for line in titleF:
+	# k: pageID, v: pageTitle
 	k, v = line.split(',')
 	titles[k] = v
 
