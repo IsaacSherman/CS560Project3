@@ -2,34 +2,33 @@
 
 import sys
 
-titleF = open('names', 'r')
-titles = {}
-for line in titleF:
-	k, v = line.split(',')
-	titles[k] = v
-
+with open('names', 'r') as titleF:
+    titles = []
+    for line in titleF:
+        k, v = line.split(',')
+        titles.append(k)
 
 for line in sys.stdin:
-	line = line.strip()
-	
-	key, value = line.split("|:")
+    line = line.strip()
 
-	index, pr = key.split(',')
-	pr = float(pr)
+    key, value = line.split("|:")
 
-	linksList = value.split(',')
+    index, pr = key.split(',')
+    pr = float(pr)
 
-	# if page is dangling
-	if not value:
-		for key in titles:
-			key = key.strip()
-			print(key + '|:' + str(pr/len(titles)))
-	
-	# if page is NOT dangling
-	else:
-		for key in linksList:
-			key = key.strip()
-			print (key + '|:' + str(pr/len(linksList)))
+    linksList = value.split(',')
 
-	# finally emit self
-	print (index + "|:" + '[' + value + ']') #PICK BACK UP HERE!
+    # if page is dangling
+    if not value:
+        for key in titles:
+            key = key.strip()
+            print(key + '|:' + str(pr / len(titles)))
+
+    # if page is NOT dangling
+    else:
+        for key in linksList:
+            key = key.strip()
+            print(key + '|:' + str(pr / len(linksList)))
+
+    # finally emit self
+    print(index + "|:" + '[' + value + ']')  # PICK BACK UP HERE!
